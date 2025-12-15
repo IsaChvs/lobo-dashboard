@@ -7,10 +7,7 @@ import random
 import pickle
 import pandas as pd
 import numpy as np
-<<<<<<< HEAD
 import os
-=======
->>>>>>> 05500c667be8304b614e3b749fed8cff693c75ea
 
 app = Flask(__name__)
 CORS(app)
@@ -21,15 +18,6 @@ client = MongoClient(MONGO_URI)
 db = client["meu_banco"]
 colecao = db["meus_dados"]
 
-<<<<<<< HEAD
-=======
-# Carrega pipeline + label encoder salvos
-with open("model.pkl", "rb") as f:
-    data = pickle.load(f)
-    modelo = data["pipeline"]
-    label_encoder = data["label_encoder"]
-
->>>>>>> 05500c667be8304b614e3b749fed8cff693c75ea
 @dataclass
 class Vitima:
     etnia: str
@@ -131,7 +119,6 @@ def associacoes():
     except Exception as e:
         return jsonify({"error": f"Erro ao processar modelo: {str(e)}"}), 500
 
-<<<<<<< HEAD
 def carregar_modelo():
     # Carrega pipeline + label encoder salvos
     if not os.path.exists("model.pkl"):
@@ -150,11 +137,6 @@ def predizer():
         modelo, label_encoder = carregar_modelo()
     except FileNotFoundError as e:
         return jsonify({"erro": str(e)}), 500
-=======
-# Endpoint para predição
-@app.route('/api/predizer', methods=['POST'])
-def predizer():
->>>>>>> 05500c667be8304b614e3b749fed8cff693c75ea
     dados = request.get_json()
     if not dados or not all(k in dados for k in ("idade", "etnia", "localizacao")):
         return jsonify({"erro": "JSON inválido. Esperado: idade, etnia, localizacao"}), 400
@@ -165,13 +147,8 @@ def predizer():
         y_pred = label_encoder.inverse_transform([y_pred_encoded])[0]
         classes = label_encoder.classes_
         resultado = {
-<<<<<<< HEAD
-          "classe_predita": y_pred,
-           "probabilidades": {classe: float(prob) for classe, prob in zip(classes, y_prob)}
-=======
             "classe_predita": y_pred,
-            "probabilidades": {classe: round(prob, 4) for classe, prob in zip(classes, y_prob)}
->>>>>>> 05500c667be8304b614e3b749fed8cff693c75ea
+            "probabilidades": {classe: float(prob) for classe, prob in zip(classes, y_prob)}
         }
         return jsonify(resultado), 200
     except Exception as e:
@@ -181,45 +158,28 @@ def predizer():
 @app.route('/api/modelo/coeficientes', methods=['GET'])
 def coeficientes_modelo():
     try:
-<<<<<<< HEAD
-        modelo, _ = carregar_modelo()  # <-- carregue o modelo aqui!
+        modelo, _ = carregar_modelo()
         preprocessor = modelo.named_steps['preprocessor']
         classifier = modelo.named_steps['classifier']
 
-=======
-        # Pegando o pré-processador e o classificador XGBoost do pipeline
-        preprocessor = modelo.named_steps['preprocessor']
-        classifier = modelo.named_steps['classifier']
-
-        # Pegando nomes das features após o OneHotEncoding
->>>>>>> 05500c667be8304b614e3b749fed8cff693c75ea
         cat_encoder = preprocessor.named_transformers_['cat']
         cat_features = cat_encoder.get_feature_names_out(preprocessor.transformers_[0][2])
         numeric_features = preprocessor.transformers_[1][2]
         all_features = list(cat_features) + list(numeric_features)
 
-<<<<<<< HEAD
-        importancias = classifier.feature_importances_
-
-        features_importances = {
-            feature: float(importance)
-=======
-        # Pegando as importâncias de feature do XGBoost
         importancias = classifier.feature_importances_
 
         # Converter numpy.float32 para float nativo do Python
         features_importances = {
-            feature: float(importance)  # Conversão crucial aqui
->>>>>>> 05500c667be8304b614e3b749fed8cff693c75ea
+            feature: float(importance)
             for feature, importance in zip(all_features, importancias)
         }
 
-        print("Features importances a serem enviadas:", features_importances)
         return jsonify(features_importances), 200
-    except Exception as e:
-        print("ERRO:", str(e))
+    except FileNotFoundError as e:
         return jsonify({"error": str(e)}), 500
-<<<<<<< HEAD
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     
 @app.route('/api/opcoes', methods=['GET'])
 def opcoes():
@@ -229,8 +189,6 @@ def opcoes():
         "etnias": etnias,
         "locais": locais
     })
-=======
->>>>>>> 05500c667be8304b614e3b749fed8cff693c75ea
 
 if __name__ == "__main__":
     if colecao.count_documents({}) == 0:

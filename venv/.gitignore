@@ -1,0 +1,9 @@
+# Ambientes virtuais
+venv/
+
+# Arquivos de dados grandes (modelos de ML) - Verifique se isso se aplica ao seu caso
+ml/
+
+# Ignorar logs, caches, etc.
+__pycache__/
+*.pyc
